@@ -28,9 +28,9 @@ It exposes endpoints for creating and deleting games, playing rounds, managing p
 - IntelliJ IDEA Community Edition
 
 ## Installation
-1. Clone repository (https://github.com/AlbertMedina/5.1-Spring-Framework-Advanced-Nivell2.git).
+1. Clone repository (https://github.com/AlbertMedina/blackjack-backend.git).
 ```
-git clone https://github.com/AlbertMedina/5.1-Spring-Framework-Advanced-Nivell2.git
+git clone https://github.com/AlbertMedina/blackjack-backend.git
 ```
 2. Navigate to project folder.
 ```
