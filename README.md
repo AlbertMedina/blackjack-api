@@ -28,9 +28,9 @@ It exposes endpoints for creating and deleting games, playing rounds, managing p
 - IntelliJ IDEA Community Edition
 
 ## Installation
-1. Clone repository (https://github.com/AlbertMedina/blackjack-backend.git).
+1. Clone repository (https://github.com/AlbertMedina/blackjack-api.git).
 ```
-git clone https://github.com/AlbertMedina/blackjack-backend.git
+git clone https://github.com/AlbertMedina/blackjack-api.git
 ```
 2. Navigate to project folder.
 ```
