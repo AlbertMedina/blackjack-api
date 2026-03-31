@@ -6,18 +6,25 @@ The API handles players and game sessions, while enforcing the rules of Blackjac
 Game data is persisted in MongoDB (Reactive), and player information and rankings are stored in MySQL (JPA).  
 It exposes endpoints for creating and deleting games, playing rounds, managing players, and retrieving player rankings.
 
-## Technologies used
-- Oracle OpenJDK 21.0.8
-- Spring Boot 3.5.8
-- Spring WebFlux
-- Maven 3.9.11
-- MongoDB
-- MySQL
-- Docker
-- Swagger
-- JUnit & Mockito
-- IntelliJ IDEA Community Edition
-
+## Architecture & Tech Stack
+Built with Java 21 and Spring Boot 3.5.8, this project follows a Layered Architecture (Controller-Service-Repository) to ensure a clean separation of concerns and maintainability across the game logic and player management.
+- **Controller Layer**  
+  Exposes the reactive REST API endpoints using Spring WebFlux, handling incoming requests and mapping them to the appropriate service operations.
+- **Service Layer**  
+  Contains the core Blackjack business logic, rules, and game state management, coordinating interactions between players, hands, and the dealer.
+- **Repository Layer**  
+  Manages data access through Spring Data, providing an abstraction for both reactive and relational persistence.
+- **Reactive Programming**  
+  Utilizes Spring WebFlux to provide a non-blocking, asynchronous API, ensuring high performance and scalability for managing multiple concurrent game sessions.
+- **Persistence**  
+  Dual Persistence Hybrid storage approach: MongoDB (Reactive) for fast, document-based game session data, and MySQL for structured player information and rankings.
+- **Testing**  
+  Automated testing using JUnit and Mockito to validate game logic verify that the API responds as expected.
+- **Containerization**  
+  Uses Docker to package the application and its databases, making it easy to run the entire project in any environment without manual setup.
+- **Documentation**  
+  Interactive API documentation generated with OpenAPI (Swagger UI), allowing easy exploration of game endpoints and player management.
+  
 ## Endpoints
 
 ### Games
