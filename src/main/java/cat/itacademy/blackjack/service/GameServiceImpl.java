@@ -8,11 +8,15 @@ import cat.itacademy.blackjack.model.Game;
 import cat.itacademy.blackjack.model.GameAction;
 import cat.itacademy.blackjack.model.GameState;
 import cat.itacademy.blackjack.repository.GameRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 @Service
 public class GameServiceImpl implements GameService {
+
+    private static final Logger log = LoggerFactory.getLogger(GameServiceImpl.class);
 
     private final PlayerService playerService;
     private final GameRepository gameRepository;
@@ -43,16 +47,22 @@ public class GameServiceImpl implements GameService {
     public Mono<GameDTO> playGame(String id, PlayGameDTO playGameDTO) {
         return gameRepository.findById(id)
                 .switchIfEmpty(Mono.error(new GameNotFoundException(id)))
-                .flatMap(g -> applyAction(g, playGameDTO.action()))
-                .flatMap(gameRepository::save)
+                .flatMap(game -> applyAction(game, playGameDTO.action()))
+                .flatMap(this::saveGameAndHandleStats)
+                .map(GameMapper::toDto);
+    }
+
+    private Mono<Game> saveGameAndHandleStats(Game game) {
+        return gameRepository.save(game)
                 .flatMap(g -> {
                     if (g.getState() == GameState.FINISHED) {
                         return playerService.updateStats(g.getPlayerId(), g.getResult())
-                                .thenReturn(g);
+                                .thenReturn(g)
+                                .doOnError(e -> log.error("EVENTUAL CONSISTENCY ERROR: Failed updating player {} stats: {}", g.getPlayerId(), e.getMessage()))
+                                .onErrorReturn(g);
                     }
                     return Mono.just(g);
-                })
-                .map(GameMapper::toDto);
+                });
     }
 
     @Override
