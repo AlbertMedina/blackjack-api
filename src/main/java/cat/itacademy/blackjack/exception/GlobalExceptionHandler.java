@@ -21,66 +21,44 @@ public class GlobalExceptionHandler {
                 .findFirst()
                 .orElse("Validation error");
 
-        ErrorResponse error = new ErrorResponse(
-                HttpStatus.BAD_REQUEST.value(),
-                HttpStatus.BAD_REQUEST.getReasonPhrase(),
-                message,
-                LocalDateTime.now()
-        );
 
-        return ResponseEntity.badRequest().body(error);
+        return buildError(HttpStatus.BAD_REQUEST, message);
     }
 
     @ExceptionHandler(PlayerNotFoundException.class)
     public ResponseEntity<ErrorResponse> handlePlayerNotFound(PlayerNotFoundException e) {
-
-        ErrorResponse error = new ErrorResponse(
-                HttpStatus.NOT_FOUND.value(),
-                HttpStatus.NOT_FOUND.getReasonPhrase(),
-                e.getMessage(),
-                LocalDateTime.now()
-        );
-
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+        return buildError(HttpStatus.NOT_FOUND, e.getMessage());
     }
 
     @ExceptionHandler(GameNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleGamerNotFound(GameNotFoundException e) {
-
-        ErrorResponse error = new ErrorResponse(
-                HttpStatus.NOT_FOUND.value(),
-                HttpStatus.NOT_FOUND.getReasonPhrase(),
-                e.getMessage(),
-                LocalDateTime.now()
-        );
-
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+        return buildError(HttpStatus.NOT_FOUND, e.getMessage());
     }
 
     @ExceptionHandler(InvalidGameActionException.class)
     public ResponseEntity<ErrorResponse> handleInvalidGameAction(InvalidGameActionException e) {
+        return buildError(HttpStatus.BAD_REQUEST, e.getMessage());
+    }
 
-        ErrorResponse error = new ErrorResponse(
-                HttpStatus.BAD_REQUEST.value(),
-                HttpStatus.BAD_REQUEST.getReasonPhrase(),
-                e.getMessage(),
-                LocalDateTime.now()
-        );
-
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    @ExceptionHandler(EmptyShoeException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidGameAction(EmptyShoeException e) {
+        return buildError(HttpStatus.BAD_REQUEST, e.getMessage());
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGenericException(Exception e) {
+        return buildError(HttpStatus.INTERNAL_SERVER_ERROR, "Internal server error: " + e.getMessage());
+    }
 
-        ErrorResponse error = new ErrorResponse(
-                HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
-                "Internal server error: " + e.getMessage(),
-                LocalDateTime.now()
+    private ResponseEntity<ErrorResponse> buildError(HttpStatus status, String message) {
+        return ResponseEntity.status(status).body(
+                new ErrorResponse(
+                        status.value(),
+                        status.getReasonPhrase(),
+                        message,
+                        LocalDateTime.now()
+                )
         );
-
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
     }
 }
 
