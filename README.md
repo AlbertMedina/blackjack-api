@@ -58,7 +58,7 @@ cd blackjack-api
 ```
 docker-compose up --build
 ```
-or, alternatively, you can use the pre-built image:
+or, alternatively, you can use the pre-built image (albertmc/blackjack-api:latest):
 ```
 docker-compose up
 ```
