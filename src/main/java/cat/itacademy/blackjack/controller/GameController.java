@@ -22,7 +22,7 @@ public class GameController {
 
     @Operation(summary = "Create new Blackjack game")
     @ApiResponse(responseCode = "201", description = "Game created successfully")
-    @PostMapping("/game/new")
+    @PostMapping("/games")
     @ResponseStatus(HttpStatus.CREATED)
     public Mono<GameDTO> createGame(@RequestBody @Valid CreateGameDTO createGameDTO) {
         return gameService.createGame(createGameDTO);
@@ -44,7 +44,7 @@ public class GameController {
 
     @Operation(summary = "Remove an existing Blackjack game")
     @ApiResponse(responseCode = "204", description = "Game removed successfully")
-    @DeleteMapping("/game/{id}/delete")
+    @DeleteMapping("/game/{id}")
     public Mono<Void> removeGame(@PathVariable String id) {
         return gameService.removeGame(id);
     }
