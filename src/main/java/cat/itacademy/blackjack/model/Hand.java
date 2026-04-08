@@ -1,5 +1,7 @@
 package cat.itacademy.blackjack.model;
 
+import cat.itacademy.blackjack.exception.EmptyShoeException;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,10 +40,18 @@ public class Hand {
     }
 
     public void pickCard(List<Card> shoe) {
+        if (shoe == null || shoe.isEmpty()) {
+            throw new EmptyShoeException();
+        }
+
         cards.add(shoe.removeFirst());
     }
 
     public static Hand newHand(List<Card> shoe) {
+        if (shoe == null || shoe.size() < 2) {
+            throw new EmptyShoeException();
+        }
+
         return new Hand(new ArrayList<>(List.of(shoe.removeFirst(), shoe.removeFirst())));
     }
 }

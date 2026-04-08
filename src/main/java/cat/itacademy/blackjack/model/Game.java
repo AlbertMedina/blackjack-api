@@ -1,5 +1,6 @@
 package cat.itacademy.blackjack.model;
 
+import cat.itacademy.blackjack.exception.EmptyShoeException;
 import cat.itacademy.blackjack.exception.InvalidGameActionException;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -62,6 +63,7 @@ public class Game {
     public void hit() {
         assertGameNotFinished(GameAction.HIT);
 
+        assertShoeHasCards();
         playerHand.pickCard(shoe);
 
         if (playerHand.getValue() > 21) {
@@ -75,15 +77,20 @@ public class Game {
         dealerPlay();
     }
 
-    public void dealerPlay() {
+    private void dealerPlay() {
+        if (this.state == GameState.FINISHED) {
+            throw new IllegalStateException("Internal error: dealerPlay was called but the game is already finished.");
+        }
+
         while (dealerHand.getValue() < 17) {
+            assertShoeHasCards();
             dealerHand.pickCard(shoe);
         }
-        
+
         gameOver();
     }
 
-    public void gameOver() {
+    private void gameOver() {
         int playerHandValue = playerHand.getValue();
         int dealerHandValue = dealerHand.getValue();
 
@@ -105,6 +112,12 @@ public class Game {
     private void assertGameNotFinished(GameAction action) {
         if (this.state == GameState.FINISHED) {
             throw new InvalidGameActionException(action, "The current game is already finished");
+        }
+    }
+
+    private void assertShoeHasCards() {
+        if (shoe == null || shoe.isEmpty()) {
+            throw new EmptyShoeException();
         }
     }
 
