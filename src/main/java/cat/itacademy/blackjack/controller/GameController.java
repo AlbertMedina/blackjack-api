@@ -30,21 +30,21 @@ public class GameController {
 
     @Operation(summary = "Play an existing game")
     @ApiResponse(responseCode = "200", description = "Played successfully")
-    @PostMapping("/game/{id}/play")
+    @PostMapping("/games/{id}/play")
     public Mono<GameDTO> playGame(@PathVariable String id, @RequestBody @Valid PlayGameDTO playGameDTO) {
         return gameService.playGame(id, playGameDTO);
     }
 
     @Operation(summary = "Get game information")
     @ApiResponse(responseCode = "200", description = "Game info retrieved successfully")
-    @GetMapping("/game/{id}")
+    @GetMapping("/games/{id}")
     public Mono<GameDTO> getGameInfoById(@PathVariable String id) {
         return gameService.getGameInfo(id);
     }
 
     @Operation(summary = "Remove an existing Blackjack game")
     @ApiResponse(responseCode = "204", description = "Game removed successfully")
-    @DeleteMapping("/game/{id}")
+    @DeleteMapping("/games/{id}")
     public Mono<Void> removeGame(@PathVariable String id) {
         return gameService.removeGame(id);
     }
