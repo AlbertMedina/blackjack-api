@@ -37,7 +37,7 @@ public class GameServiceImplTest {
         Player player = new Player("PlayerName");
 
         when(playerService.getOrCreatePlayer("PlayerName"))
-                .thenReturn(player);
+                .thenReturn(Mono.just(player));
 
         Game game = Game.newGame(1L);
 

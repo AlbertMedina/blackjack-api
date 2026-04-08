@@ -10,6 +10,8 @@ import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 
@@ -38,7 +40,7 @@ class PlayerControllerTest {
         );
 
         when(playerService.updatePlayerName(1L, request))
-                .thenReturn(response);
+                .thenReturn(Mono.just(response));
 
         webTestClient.put()
                 .uri("/player/{id}", 1L)
@@ -75,7 +77,8 @@ class PlayerControllerTest {
                 new PlayerDTO(3L, "Player3", 1, 0, 4)
         );
 
-        when(playerService.getPlayersRanking()).thenReturn(mockPlayers);
+        when(playerService.getPlayersRanking())
+                .thenReturn(Flux.fromIterable(mockPlayers));
 
         webTestClient.get()
                 .uri("/ranking")

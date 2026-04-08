@@ -11,12 +11,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 
 import java.util.List;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -36,14 +37,18 @@ public class PlayerServiceImplTest {
         UpdatePlayerDTO request = new UpdatePlayerDTO("NewName");
 
         when(playerRepository.findById(1L))
-                .thenReturn(Optional.of(player));
+                .thenReturn(Mono.just(player));
 
         when(playerRepository.save(player))
-                .thenReturn(player);
+                .thenReturn(Mono.just(player));
 
-        PlayerDTO result = playerService.updatePlayerName(1L, request);
+        Mono<PlayerDTO> result = playerService.updatePlayerName(1L, request);
 
-        assertEquals("NewName", result.name());
+        StepVerifier.create(result)
+                .assertNext(p -> {
+                    assertEquals("NewName", p.name());
+                })
+                .verifyComplete();
     }
 
     @Test
@@ -51,9 +56,11 @@ public class PlayerServiceImplTest {
         UpdatePlayerDTO request = new UpdatePlayerDTO("NewName");
 
         when(playerRepository.findById(1L))
-                .thenReturn(Optional.empty());
+                .thenReturn(Mono.empty());
 
-        assertThrows(PlayerNotFoundException.class, () -> playerService.updatePlayerName(1L, request));
+        StepVerifier.create(playerService.updatePlayerName(1L, request))
+                .expectError(PlayerNotFoundException.class)
+                .verify();
     }
 
     @Test
@@ -70,14 +77,21 @@ public class PlayerServiceImplTest {
         List<Player> players = List.of(player1, player2, player3);
 
         when(playerRepository.findAllByOrderByNumberOfWinsDescNumberOfTiesDescNumberOfLossesAsc())
-                .thenReturn(players);
+                .thenReturn(Flux.fromIterable(players));
 
-        List<PlayerDTO> result = playerService.getPlayersRanking();
+        Flux<PlayerDTO> result = playerService.getPlayersRanking();
 
-        assertEquals(3, result.size());
-        assertEquals("Player1", result.get(0).name());
-        assertEquals("Player2", result.get(1).name());
-        assertEquals("Player3", result.get(2).name());
+        StepVerifier.create(result)
+                .assertNext(p -> {
+                    assertEquals("Player1", p.name());
+                })
+                .assertNext(p -> {
+                    assertEquals("Player2", p.name());
+                })
+                .assertNext(p -> {
+                    assertEquals("Player3", p.name());
+                })
+                .verifyComplete();
     }
 
     @Test
@@ -85,11 +99,15 @@ public class PlayerServiceImplTest {
         Player player = new Player("PlayerName");
 
         when(playerRepository.findByNameIgnoreCase("PlayerName"))
-                .thenReturn(Optional.of(player));
+                .thenReturn(Mono.just(player));
 
-        Player result = playerService.getOrCreatePlayer("PlayerName");
+        Mono<Player> result = playerService.getOrCreatePlayer("PlayerName");
 
-        assertEquals(player, result);
+        StepVerifier.create(result)
+                .assertNext(p -> {
+                    assertEquals(player, p);
+                })
+                .verifyComplete();
     }
 
     @Test
@@ -97,14 +115,18 @@ public class PlayerServiceImplTest {
         Player newPlayer = new Player("PlayerName");
 
         when(playerRepository.findByNameIgnoreCase("PlayerName"))
-                .thenReturn(Optional.empty());
+                .thenReturn(Mono.empty());
 
         when(playerRepository.save(any(Player.class)))
-                .thenReturn(newPlayer);
+                .thenReturn(Mono.just(newPlayer));
 
-        Player result = playerService.getOrCreatePlayer("PlayerName");
+        Mono<Player> result = playerService.getOrCreatePlayer("PlayerName");
 
-        assertEquals("PlayerName", result.getName());
+        StepVerifier.create(result)
+                .assertNext(p -> {
+                    assertEquals("PlayerName", p.getName());
+                })
+                .verifyComplete();
     }
 
     @Test
@@ -112,12 +134,13 @@ public class PlayerServiceImplTest {
         Player player = new Player("PlayerName");
 
         when(playerRepository.findById(1L))
-                .thenReturn(Optional.of(player));
+                .thenReturn(Mono.just(player));
 
         when(playerRepository.save(player))
-                .thenReturn(player);
+                .thenReturn(Mono.just(player));
 
-        playerService.updateStats(1L, GameResult.PLAYER_WINS);
+        StepVerifier.create(playerService.updateStats(1L, GameResult.PLAYER_WINS))
+                .verifyComplete();
 
         assertEquals(1, player.getNumberOfWins());
     }
@@ -125,11 +148,10 @@ public class PlayerServiceImplTest {
     @Test
     void updateStats_shouldThrowExceptionWhenPlayerDoesNotExist() {
         when(playerRepository.findById(1L))
-                .thenReturn(Optional.empty());
+                .thenReturn(Mono.empty());
 
-        assertThrows(
-                PlayerNotFoundException.class,
-                () -> playerService.updateStats(1L, GameResult.PLAYER_WINS)
-        );
+        StepVerifier.create(playerService.updateStats(1L, GameResult.PLAYER_WINS))
+                .expectError(PlayerNotFoundException.class)
+                .verify();
     }
 }
