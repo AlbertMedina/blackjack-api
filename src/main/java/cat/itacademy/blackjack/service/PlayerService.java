@@ -4,16 +4,16 @@ import cat.itacademy.blackjack.dto.PlayerDTO;
 import cat.itacademy.blackjack.dto.UpdatePlayerDTO;
 import cat.itacademy.blackjack.model.GameResult;
 import cat.itacademy.blackjack.model.Player;
-
-import java.util.List;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 public interface PlayerService {
 
-    PlayerDTO updatePlayerName(Long id, UpdatePlayerDTO playerDTO);
+    Mono<PlayerDTO> updatePlayerName(Long playerId, UpdatePlayerDTO playerDTO);
 
-    Player getOrCreatePlayer(String playerName);
+    Mono<Player> getOrCreatePlayer(String playerName);
 
-    List<PlayerDTO> getPlayersRanking();
+    Flux<PlayerDTO> getPlayersRanking();
 
-    void updateStats(Long id, GameResult gameResult);
+    Mono<Void> updateStats(Long playerId, GameResult gameResult);
 }

@@ -7,7 +7,6 @@ import cat.itacademy.blackjack.mapper.GameMapper;
 import cat.itacademy.blackjack.model.Game;
 import cat.itacademy.blackjack.model.GameAction;
 import cat.itacademy.blackjack.model.GameState;
-import cat.itacademy.blackjack.model.Player;
 import cat.itacademy.blackjack.repository.GameRepository;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
@@ -25,8 +24,11 @@ public class GameServiceImpl implements GameService {
 
     @Override
     public Mono<GameDTO> createGame(CreateGameDTO createGameDTO) {
-        Player player = playerService.getOrCreatePlayer(createGameDTO.playerName());
-        return gameRepository.save(Game.newGame(player.getId()))
+        return playerService.getOrCreatePlayer(createGameDTO.playerName())
+                .flatMap(p -> {
+                    Game newGame = Game.newGame(p.getId());
+                    return gameRepository.save(newGame);
+                })
                 .map(GameMapper::toDto);
     }
 
@@ -41,24 +43,14 @@ public class GameServiceImpl implements GameService {
     public Mono<GameDTO> playGame(String id, PlayGameDTO playGameDTO) {
         return gameRepository.findById(id)
                 .switchIfEmpty(Mono.error(new GameNotFoundException(id)))
+                .flatMap(g -> applyAction(g, playGameDTO.action()))
+                .flatMap(gameRepository::save)
                 .flatMap(g -> {
-                    GameAction action = playGameDTO.action();
-
-                    if (action == null) {
-                        throw new InvalidGameActionException(null, "Unsupported game action");
-                    }
-
-                    switch (action) {
-                        case HIT -> g.hit();
-                        case STAND -> g.stand();
-                        default -> throw new InvalidGameActionException(action, "Unsupported game action");
-                    }
-
                     if (g.getState() == GameState.FINISHED) {
-                        playerService.updateStats(g.getPlayerId(), g.getResult());
+                        return playerService.updateStats(g.getPlayerId(), g.getResult())
+                                .thenReturn(g);
                     }
-
-                    return gameRepository.save(g);
+                    return Mono.just(g);
                 })
                 .map(GameMapper::toDto);
     }
@@ -68,5 +60,16 @@ public class GameServiceImpl implements GameService {
         return gameRepository.findById(id)
                 .switchIfEmpty(Mono.error(new GameNotFoundException(id)))
                 .flatMap(gameRepository::delete);
+    }
+
+    private Mono<Game> applyAction(Game g, GameAction action) {
+        if (action == null) {
+            return Mono.error(new InvalidGameActionException(null, "Action cannot be null"));
+        }
+
+        return switch (action) {
+            case HIT -> Mono.fromRunnable(g::hit).thenReturn(g);
+            case STAND -> Mono.fromRunnable(g::stand).thenReturn(g);
+        };
     }
 }

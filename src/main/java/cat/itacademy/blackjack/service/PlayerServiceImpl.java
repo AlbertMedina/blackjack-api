@@ -8,8 +8,8 @@ import cat.itacademy.blackjack.model.GameResult;
 import cat.itacademy.blackjack.model.Player;
 import cat.itacademy.blackjack.repository.PlayerRepository;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @Service
 public class PlayerServiceImpl implements PlayerService {
@@ -21,41 +21,42 @@ public class PlayerServiceImpl implements PlayerService {
     }
 
     @Override
-    public PlayerDTO updatePlayerName(Long id, UpdatePlayerDTO updatePlayerDTO) {
-        Player player = playerRepository.findById(id)
-                .orElseThrow(() -> new PlayerNotFoundException(id));
-
-        player.setName(updatePlayerDTO.name());
-
-        Player savedPlayer = playerRepository.save(player);
-        return PlayerMapper.toDto(savedPlayer);
+    public Mono<PlayerDTO> updatePlayerName(Long playerId, UpdatePlayerDTO updatePlayerDTO) {
+        return playerRepository.findById(playerId)
+                .switchIfEmpty(Mono.error(new PlayerNotFoundException(playerId)))
+                .flatMap(p -> {
+                    p.setName(updatePlayerDTO.name());
+                    return playerRepository.save(p);
+                })
+                .map(PlayerMapper::toDto);
     }
 
     @Override
-    public List<PlayerDTO> getPlayersRanking() {
+    public Flux<PlayerDTO> getPlayersRanking() {
         return playerRepository.findAllByOrderByNumberOfWinsDescNumberOfTiesDescNumberOfLossesAsc()
-                .stream()
-                .map(PlayerMapper::toDto)
-                .toList();
+                .map(PlayerMapper::toDto);
     }
 
     @Override
-    public Player getOrCreatePlayer(String playerName) {
+    public Mono<Player> getOrCreatePlayer(String playerName) {
         return playerRepository.findByNameIgnoreCase(playerName)
-                .orElseGet(() -> playerRepository.save(new Player(playerName)));
+                .switchIfEmpty(Mono.defer(() ->
+                        playerRepository.save(new Player(playerName))
+                ));
     }
 
     @Override
-    public void updateStats(Long playerId, GameResult result) {
-        Player player = playerRepository.findById(playerId)
-                .orElseThrow(() -> new PlayerNotFoundException(playerId));
-
-        switch (result) {
-            case PLAYER_WINS -> player.win();
-            case TIE -> player.tie();
-            case PLAYER_LOSES -> player.lose();
-        }
-
-        playerRepository.save(player);
+    public Mono<Void> updateStats(Long playerId, GameResult result) {
+        return playerRepository.findById(playerId)
+                .switchIfEmpty(Mono.error(new PlayerNotFoundException(playerId)))
+                .flatMap(p -> {
+                    switch (result) {
+                        case PLAYER_WINS -> p.win();
+                        case TIE -> p.tie();
+                        case PLAYER_LOSES -> p.lose();
+                    }
+                    return playerRepository.save(p);
+                })
+                .then();
     }
 }

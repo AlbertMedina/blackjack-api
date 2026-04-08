@@ -1,14 +1,13 @@
 package cat.itacademy.blackjack.repository;
 
 import cat.itacademy.blackjack.model.Player;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.r2dbc.repository.R2dbcRepository;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
-import java.util.List;
-import java.util.Optional;
+public interface PlayerRepository extends R2dbcRepository<Player, Long> {
 
-public interface PlayerRepository extends JpaRepository<Player, Long> {
+    Mono<Player> findByNameIgnoreCase(String name);
 
-    Optional<Player> findByNameIgnoreCase(String name);
-
-    List<Player> findAllByOrderByNumberOfWinsDescNumberOfTiesDescNumberOfLossesAsc();
+    Flux<Player> findAllByOrderByNumberOfWinsDescNumberOfTiesDescNumberOfLossesAsc();
 }

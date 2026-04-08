@@ -6,10 +6,9 @@ import cat.itacademy.blackjack.service.PlayerService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @RestController
 public class PlayerController {
@@ -23,18 +22,14 @@ public class PlayerController {
     @Operation(summary = "Update player name")
     @ApiResponse(responseCode = "200", description = "Player name updated successfully")
     @PutMapping("/players/{id}")
-    public ResponseEntity<PlayerDTO> updatePlayerName(@PathVariable Long id, @RequestBody @Valid UpdatePlayerDTO playerDTORequest) {
-        PlayerDTO player = playerService.updatePlayerName(id, playerDTORequest);
-        return ResponseEntity.ok(player);
+    public Mono<PlayerDTO> updatePlayerName(@PathVariable Long id, @RequestBody @Valid UpdatePlayerDTO playerDTORequest) {
+        return playerService.updatePlayerName(id, playerDTORequest);
     }
 
     @Operation(summary = "Get the ranking of players by number of wins")
     @ApiResponse(responseCode = "200", description = "Player ranking retrieved successfully")
-    @GetMapping("/players//ranking")
-    public ResponseEntity<List<PlayerDTO>> getPlayersRanking() {
-        List<PlayerDTO> players = playerService.getPlayersRanking();
-        return ResponseEntity.ok(players);
+    @GetMapping("/players/ranking")
+    public Flux<PlayerDTO> getPlayersRanking() {
+        return playerService.getPlayersRanking();
     }
 }
-
-
