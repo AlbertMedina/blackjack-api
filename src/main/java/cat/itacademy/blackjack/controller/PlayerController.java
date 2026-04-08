@@ -11,6 +11,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @RestController
+@RequestMapping("/players")
 public class PlayerController {
 
     private final PlayerService playerService;
@@ -21,14 +22,14 @@ public class PlayerController {
 
     @Operation(summary = "Update player name")
     @ApiResponse(responseCode = "200", description = "Player name updated successfully")
-    @PutMapping("/players/{id}")
+    @PutMapping("/{id}")
     public Mono<PlayerDTO> updatePlayerName(@PathVariable Long id, @RequestBody @Valid UpdatePlayerDTO playerDTORequest) {
         return playerService.updatePlayerName(id, playerDTORequest);
     }
 
     @Operation(summary = "Get the ranking of players by number of wins")
     @ApiResponse(responseCode = "200", description = "Player ranking retrieved successfully")
-    @GetMapping("/players/ranking")
+    @GetMapping("/ranking")
     public Flux<PlayerDTO> getPlayersRanking() {
         return playerService.getPlayersRanking();
     }
