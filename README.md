@@ -54,15 +54,11 @@ cd blackjack-api
 
 ## Execution
 1. Ensure Docker is installed and running.
-2. Pull the image from Docker Hub:
+2. Build and start the application and databases:
 ```
-docker pull albertmc/blackjack-api:latest
+docker-compose up --build
 ```
-or build it locally:
-```
-docker build -t blackjack-api .
-```
-3. Start the application and databases with Docker Compose:
+or, alternatively, you can use the pre-built image:
 ```
 docker-compose up
 ```
