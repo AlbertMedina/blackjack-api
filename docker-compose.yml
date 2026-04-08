@@ -27,7 +27,8 @@ services:
       - blackjack-network
 
   api:
-    image: blackjack-api
+    build: .
+    image: albertmc/blackjack-api:latest
     container_name: blackjack-api
     ports:
       - "8080:8080"
