@@ -60,9 +60,7 @@ public class Game {
     }
 
     public void hit() {
-        if (state == GameState.FINISHED) {
-            throw new InvalidGameActionException(GameAction.HIT, "The current game is already finished");
-        }
+        assertGameNotFinished(GameAction.HIT);
 
         playerHand.pickCard(shoe);
 
@@ -72,9 +70,7 @@ public class Game {
     }
 
     public void stand() {
-        if (state == GameState.FINISHED) {
-            throw new InvalidGameActionException(GameAction.STAND, "The current game is already finished");
-        }
+        assertGameNotFinished(GameAction.STAND);
 
         dealerPlay();
     }
@@ -83,6 +79,7 @@ public class Game {
         while (dealerHand.getValue() < 17) {
             dealerHand.pickCard(shoe);
         }
+        
         gameOver();
     }
 
@@ -103,6 +100,12 @@ public class Game {
         }
 
         state = GameState.FINISHED;
+    }
+
+    private void assertGameNotFinished(GameAction action) {
+        if (this.state == GameState.FINISHED) {
+            throw new InvalidGameActionException(action, "The current game is already finished");
+        }
     }
 
     public static Game newGame(Long playerId) {
