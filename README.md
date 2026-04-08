@@ -1,9 +1,10 @@
 # Blackjack API
 
 ## Description
-This project implements a reactive API to manage a Blackjack game using Spring Boot and Spring WebFlux.
+This project implements a fully reactive API to manage a Blackjack game using Spring Boot and Spring WebFlux.
+The system follows a non-blocking paradigm from the entry point to the persistence layer.
 The API handles players and game sessions, while enforcing the rules of Blackjack. 
-Game data is persisted in MongoDB (Reactive), and player information and rankings are stored in MySQL (JPA).  
+Game data is persisted in MongoDB (Reactive), and player information and rankings are stored in MySQL using R2DBC, ensuring no blocking calls throughout the execution flow.
 It exposes endpoints for creating and deleting games, playing rounds, managing players, and retrieving player rankings.
 
 ## Architecture & Tech Stack
@@ -17,7 +18,7 @@ Built with Java 21 and Spring Boot 3.5.8, this project follows a Layered Archite
 - **Reactive Programming**  
   Utilizes Spring WebFlux to provide a non-blocking, asynchronous API, ensuring high performance and scalability for managing multiple concurrent game sessions.
 - **Persistence**  
-  Dual Persistence Hybrid storage approach: MongoDB (Reactive) for fast, document-based game session data, and MySQL for structured player information and rankings.
+  A hybrid storage approach using MongoDB for document-based game sessions and MySQL for relational player data.
 - **Testing**  
   Automated testing using JUnit and Mockito to validate game logic verify that the API responds as expected.
 - **Containerization**  
@@ -30,16 +31,16 @@ Built with Java 21 and Spring Boot 3.5.8, this project follows a Layered Archite
 ### Games
 | Method | Endpoint          | Description                 | Request Body               |
 |--------|-------------------|-----------------------------|----------------------------|
-| POST   | /game/new         | Create a new Blackjack game | `{ "playerName": "John" }` |
-| GET    | /game/{id}        | Get game information        | N/A                        |
-| POST   | /game/{id}/play   | Play an existing game       | `{ "action": "HIT" }`      |
-| DELETE | /game/{id}/delete | Delete an existing game     | N/A                        |
+| POST   | /games            | Create a new Blackjack game | `{ "playerName": "John" }` |
+| GET    | /games/{id}       | Get game information        | N/A                        |
+| POST   | /games/{id}/play  | Play an existing game       | `{ "action": "HIT" }`      |
+| DELETE | /games/{id}       | Delete an existing game     | N/A                        |
 
 ### Players
-| Method | Endpoint     | Description                                  | Request Body         |
-|--------|--------------|----------------------------------------------|----------------------|
-| GET    | /ranking     | Get the ranking of players by number of wins | N/A                  |
-| PUT    | /player/{id} | Update player name                           | `{ "name": "John" }` |
+| Method | Endpoint         | Description                                  | Request Body         |
+|--------|------------------|----------------------------------------------|----------------------|
+| PUT    | /players/{id}    | Update player name                           | `{ "name": "John" }` |
+| GET    | /players/ranking | Get the ranking of players by number of wins | N/A                  |
 
 ## Installation
 1. Clone repository (https://github.com/AlbertMedina/blackjack-api.git).
