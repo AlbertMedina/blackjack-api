@@ -22,7 +22,7 @@ public class PlayerController {
 
     @Operation(summary = "Update player name")
     @ApiResponse(responseCode = "200", description = "Player name updated successfully")
-    @PutMapping("/player/{id}")
+    @PutMapping("/players/{id}")
     public ResponseEntity<PlayerDTO> updatePlayerName(@PathVariable Long id, @RequestBody @Valid UpdatePlayerDTO playerDTORequest) {
         PlayerDTO player = playerService.updatePlayerName(id, playerDTORequest);
         return ResponseEntity.ok(player);
@@ -30,7 +30,7 @@ public class PlayerController {
 
     @Operation(summary = "Get the ranking of players by number of wins")
     @ApiResponse(responseCode = "200", description = "Player ranking retrieved successfully")
-    @GetMapping("/ranking")
+    @GetMapping("/players//ranking")
     public ResponseEntity<List<PlayerDTO>> getPlayersRanking() {
         List<PlayerDTO> players = playerService.getPlayersRanking();
         return ResponseEntity.ok(players);
