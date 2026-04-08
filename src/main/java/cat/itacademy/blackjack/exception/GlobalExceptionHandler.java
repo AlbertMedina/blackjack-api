@@ -31,27 +31,35 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(PlayerNotFoundException.class)
     public ResponseEntity<ErrorResponse> handlePlayerNotFound(PlayerNotFoundException e) {
+        log.warn("Player not found: {}", e.getMessage(), e);
+
         return buildError(HttpStatus.NOT_FOUND, e.getMessage());
     }
 
     @ExceptionHandler(GameNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleGamerNotFound(GameNotFoundException e) {
+        log.warn("Game not found: {}", e.getMessage(), e);
+
         return buildError(HttpStatus.NOT_FOUND, e.getMessage());
     }
 
     @ExceptionHandler(InvalidGameActionException.class)
     public ResponseEntity<ErrorResponse> handleInvalidGameAction(InvalidGameActionException e) {
+        log.warn("Invalid game action: {}", e.getMessage(), e);
+
         return buildError(HttpStatus.BAD_REQUEST, e.getMessage());
     }
 
     @ExceptionHandler(EmptyShoeException.class)
-    public ResponseEntity<ErrorResponse> handleInvalidGameAction(EmptyShoeException e) {
+    public ResponseEntity<ErrorResponse> handleEmptyShoe(EmptyShoeException e) {
+        log.error("Empty shoe: {}", e.getMessage(), e);
+
         return buildError(HttpStatus.BAD_REQUEST, e.getMessage());
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGenericException(Exception e) {
-        log.error("Internal Server Error:: {}", e.getMessage(), e);
+        log.error("Internal Server Error: {}", e.getMessage(), e);
 
         return buildError(HttpStatus.INTERNAL_SERVER_ERROR, "Unexpected error");
     }
