@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -92,7 +93,7 @@ public class GameServiceImplTest {
         when(gameRepository.save(any(Game.class)))
                 .thenAnswer(inv -> Mono.just(game));
 
-        when(playerService.updateStats(anyLong(), any(GameResult.class)))
+        Mockito.lenient().when(playerService.updateStats(anyLong(), any(GameResult.class)))
                 .thenReturn(Mono.empty());
 
         PlayGameDTO request = new PlayGameDTO(GameAction.HIT);
