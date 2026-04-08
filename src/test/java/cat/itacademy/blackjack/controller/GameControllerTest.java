@@ -54,7 +54,7 @@ public class GameControllerTest {
                 .thenReturn(Mono.just(response));
 
         webTestClient.post()
-                .uri("/game/new")
+                .uri("/games")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(request)
                 .exchange()
@@ -92,7 +92,7 @@ public class GameControllerTest {
                 .thenReturn(Mono.just(response));
 
         webTestClient.post()
-                .uri("/game/{id}/play", "1")
+                .uri("/games/{id}/play", "1")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(request)
                 .exchange()
@@ -111,7 +111,7 @@ public class GameControllerTest {
                 .thenThrow(new GameNotFoundException("1"));
 
         webTestClient.post()
-                .uri("/game/{id}/play", "1")
+                .uri("/games/{id}/play", "1")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(request)
                 .exchange()
@@ -143,7 +143,7 @@ public class GameControllerTest {
                 .thenReturn(Mono.just(response));
 
         webTestClient.get()
-                .uri("/game/{id}", "1")
+                .uri("/games/{id}", "1")
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(GameDTO.class)
@@ -158,7 +158,7 @@ public class GameControllerTest {
                 .thenThrow(new GameNotFoundException("1"));
 
         webTestClient.get()
-                .uri("/game/{id}", "1")
+                .uri("/games/{id}", "1")
                 .exchange()
                 .expectStatus().isNotFound();
     }
@@ -169,7 +169,7 @@ public class GameControllerTest {
                 .thenReturn(Mono.empty());
 
         webTestClient.delete()
-                .uri("/game/{id}/delete", "1")
+                .uri("/games/{id}", "1")
                 .exchange()
                 .expectStatus().isOk();
     }
@@ -180,7 +180,7 @@ public class GameControllerTest {
                 .thenThrow(new GameNotFoundException("1"));
 
         webTestClient.delete()
-                .uri("/game/{id}/delete", "1")
+                .uri("/games/{id}", "1")
                 .exchange()
                 .expectStatus().isNotFound();
     }

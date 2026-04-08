@@ -35,9 +35,9 @@ services:
       - mysql
       - mongo
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/blackjack
-      SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: 12345
+      SPRING_R2DBC_URL: r2dbc:mysql://mysql:3306/blackjack
+      SPRING_R2DBC_USERNAME: root
+      SPRING_R2DBC_PASSWORD: 12345
       SPRING_DATA_MONGODB_URI: mongodb://mongo:27017/blackjack
     networks:
       - blackjack-network

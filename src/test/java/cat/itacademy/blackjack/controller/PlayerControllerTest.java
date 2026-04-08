@@ -43,7 +43,7 @@ class PlayerControllerTest {
                 .thenReturn(Mono.just(response));
 
         webTestClient.put()
-                .uri("/player/{id}", 1L)
+                .uri("/players/{id}", 1L)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(request)
                 .exchange()
@@ -62,7 +62,7 @@ class PlayerControllerTest {
                 .thenThrow(new PlayerNotFoundException(1L));
 
         webTestClient.put()
-                .uri("/player/{id}", 1L)
+                .uri("/players/{id}", 1L)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(request)
                 .exchange()
@@ -81,7 +81,7 @@ class PlayerControllerTest {
                 .thenReturn(Flux.fromIterable(mockPlayers));
 
         webTestClient.get()
-                .uri("/ranking")
+                .uri("/players/ranking")
                 .exchange()
                 .expectStatus().isOk()
                 .expectBodyList(PlayerDTO.class)

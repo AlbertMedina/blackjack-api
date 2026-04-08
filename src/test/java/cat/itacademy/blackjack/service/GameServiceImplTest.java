@@ -17,6 +17,7 @@ import reactor.test.StepVerifier;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -91,6 +92,9 @@ public class GameServiceImplTest {
         when(gameRepository.save(any(Game.class)))
                 .thenAnswer(inv -> Mono.just(game));
 
+        when(playerService.updateStats(anyLong(), any(GameResult.class)))
+                .thenReturn(Mono.empty());
+
         PlayGameDTO request = new PlayGameDTO(GameAction.HIT);
 
         Mono<GameDTO> result = gameService.playGame("1", request);
@@ -113,6 +117,9 @@ public class GameServiceImplTest {
 
         when(gameRepository.save(any(Game.class)))
                 .thenAnswer(inv -> Mono.just(game));
+
+        when(playerService.updateStats(anyLong(), any(GameResult.class)))
+                .thenReturn(Mono.empty());
 
         PlayGameDTO request = new PlayGameDTO(GameAction.STAND);
 
